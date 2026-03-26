@@ -24,17 +24,21 @@ Files marked ✓ exist; unmarked are planned (not yet implemented).
 ```
 backend/
 ├── app/
-│   ├── main.py ✓            # FastAPI app with GET /health; lifespan + routers to be added in later issues
+│   ├── main.py ✓            # FastAPI app with GET /health; includes bookmarks_router (issue #3)
 │   ├── database.py ✓        # SQLAlchemy async engine + session factory; DATABASE_URL from env (default /app/data/bookmarks.db)
-│   ├── routes/              # (planned — issue #3, #4)
-│   ├── services/            # (planned — issue #3, #4)
-│   ├── repositories/        # (planned — issue #3, #4)
+│   ├── routes/ ✓            # (issue #3, #4)
+│   │   └── bookmarks.py ✓  # GET /api/bookmarks, /exists, /{id}; POST, PUT, DELETE /{id}
+│   ├── services/ ✓          # (issue #3, #4)
+│   │   └── bookmark.py ✓   # BookmarkService + BookmarkNotFound exception
+│   ├── repositories/ ✓      # (issue #3, #4)
+│   │   └── bookmark.py ✓   # BookmarkRepository: upsert, get_by_id, update, delete, exists, search
 │   ├── models/ ✓            # SQLAlchemy ORM models (issue #2)
 │   │   ├── bookmark.py ✓    # Bookmark model + bookmark_tags join table (many-to-many)
 │   │   ├── tag.py ✓         # Tag model; back-ref to Bookmark via bookmark_tags
 │   │   ├── task_config.py ✓ # TaskConfig model; url_patterns + tags as JSON columns
 │   │   └── __init__.py ✓    # Re-exports Bookmark, Tag, TaskConfig, bookmark_tags
-│   ├── schemas/             # (planned — issue #3, #4)
+│   ├── schemas/ ✓           # (issue #3, #4)
+│   │   └── bookmark.py ✓   # BookmarkCreate, BookmarkUpdate, BookmarkResponse, PaginatedBookmarkResponse
 │   ├── tasks/               # (planned — issue #3+)
 │   └── scheduler.py         # (planned — issue #3+)
 ├── alembic/ ✓               # Alembic migrations (issue #2)
@@ -46,8 +50,11 @@ backend/
 ├── pytest.ini ✓             # asyncio_mode=auto; loop_scope=function
 ├── tests/ ✓                 # (issue #2+)
 │   ├── conftest.py ✓        # in-memory SQLite async session fixture (db_session)
+│   ├── integration/ ✓
+│   │   └── test_bookmarks_api.py ✓  # 17 integration tests: AsyncClient + ASGITransport; dep override for DB
 │   └── unit/
-│       └── test_models.py ✓ # 6 tests: import check + PRAGMA table_info per table
+│       ├── test_bookmark_repository.py ✓  # 16 unit tests: search, filter, sort, paginate, upsert, exists, delete
+│       └── test_models.py ✓  # 6 tests: import check + PRAGMA table_info per table
 └── requirements.txt ✓       # fastapi, uvicorn, sqlalchemy, aiosqlite, alembic, apscheduler, httpx, pydantic, pytest, pytest-asyncio — all pinned
 ```
 
