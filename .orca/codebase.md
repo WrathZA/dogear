@@ -19,85 +19,58 @@ bookmark-it/
 
 Python 3.12 + FastAPI application. Entry point: `backend/app/main.py`.
 
+Files marked ✓ exist; unmarked are planned (not yet implemented).
+
 ```
 backend/
 ├── app/
-│   ├── main.py              # FastAPI app instantiation, lifespan (APScheduler start/stop), router registration
-│   ├── routes/
-│   │   ├── bookmarks.py     # GET/POST/PUT/DELETE /api/bookmarks, GET /api/bookmarks/exists
-│   │   ├── tags.py          # GET /api/tags, PUT /api/tags/{name}/rename, DELETE /api/tags/{name}
-│   │   └── tasks.py         # GET /api/task-configs, PUT /api/task-configs/{name}, POST /api/tasks/run/*
-│   ├── services/
-│   │   ├── bookmark_service.py   # Orchestrates BookmarkRepository; triggers TaskRunner on create/update
-│   │   ├── tag_service.py        # Orchestrates TagRepository; rename and delete propagation
-│   │   └── task_runner.py        # Loads TaskConfig, evaluates eligibility (URL regex + tags), dispatches task
-│   ├── repositories/
-│   │   ├── bookmark_repository.py  # SQLAlchemy async CRUD; search, filter, sort, paginate, upsert
-│   │   └── tag_repository.py       # Tag aggregation, rename, delete across bookmark join table
-│   ├── models/
-│   │   ├── bookmark.py      # Bookmark ORM model (id, url, name, description, screenshot_path, favourite, timestamps)
-│   │   ├── tag.py           # Tag ORM model (id, name); many-to-many join to Bookmark
-│   │   └── task_config.py   # TaskConfig ORM model (task_name, enabled, run_on_create, run_on_update, url_patterns, tags, schedule_interval_seconds)
-│   ├── schemas/
-│   │   ├── bookmark.py      # BookmarkCreate, BookmarkUpdate, BookmarkResponse, PaginatedBookmarkResponse
-│   │   ├── tag.py           # TagResponse, TagRenameRequest
-│   │   └── task_config.py   # TaskConfigResponse, TaskConfigUpdate
-│   ├── tasks/
-│   │   ├── base.py          # BackgroundTask abstract base: name, description, run(bookmark)
-│   │   ├── registry.py      # TaskRegistry singleton; tasks self-register on import
-│   │   ├── title_fetch.py   # Fetches <title> from bookmark URL; fills name if blank
-│   │   ├── screenshot.py    # Takes screenshot of bookmark URL; writes to /app/data/artifacts/
-│   │   └── validity_check.py # HTTP HEAD request to verify URL is reachable; updates a status field
-│   ├── scheduler.py         # APScheduler AsyncIOScheduler; loads TaskConfigs at startup; re-registers on config update
-│   └── database.py          # SQLAlchemy async engine + session factory; DATABASE_URL from env
-├── alembic/
-│   ├── env.py
-│   ├── versions/            # Migration scripts
-│   └── alembic.ini
-├── tests/
-│   ├── unit/
-│   │   ├── test_task_runner.py     # Eligibility logic: URL regex, tag matching
-│   │   └── test_bookmark_repository.py  # Search, filter, sort, paginate, upsert
-│   └── integration/
-│       ├── test_bookmarks_api.py   # Full API routes via TestClient
-│       └── test_tags_api.py
-└── requirements.txt
+│   ├── main.py ✓            # FastAPI app with GET /health; lifespan + routers to be added in later issues
+│   ├── database.py ✓        # SQLAlchemy async engine + session factory; DATABASE_URL from env (default /app/data/bookmarks.db)
+│   ├── routes/              # (planned — issue #3, #4)
+│   ├── services/            # (planned — issue #3, #4)
+│   ├── repositories/        # (planned — issue #3, #4)
+│   ├── models/              # (planned — issue #2)
+│   ├── schemas/             # (planned — issue #3, #4)
+│   ├── tasks/               # (planned — issue #3+)
+│   └── scheduler.py         # (planned — issue #3+)
+├── alembic/                 # (planned — issue #2)
+├── tests/                   # (planned — issue #2+)
+└── requirements.txt ✓       # fastapi, uvicorn, sqlalchemy, aiosqlite, alembic, apscheduler, httpx, pydantic — all pinned
 ```
 
 ## Frontend (`frontend/`)
 
 Vite + React 18 SPA. Styled with 98.css. Entry point: `frontend/src/main.tsx`.
 
+Files marked ✓ exist; unmarked are planned (not yet implemented).
+
 ```
 frontend/
 ├── src/
-│   ├── main.tsx             # React root, router setup (React Router)
+│   ├── main.tsx ✓           # React root; BrowserRouter + Routes; imports 98.css globally; app-shell layout
+│   ├── index.css ✓          # App shell layout (flex, nav width); body.dark theme class
 │   ├── pages/
-│   │   ├── BookmarkList.tsx    # Main page; URL params drive search/filter/sort/page state
-│   │   ├── Favourites.tsx      # Filtered view: favourite=true
-│   │   ├── BookmarkDetail.tsx  # Add / edit form page (/bookmarks/new, /bookmarks/:id)
-│   │   ├── Tags.tsx            # Tag list with counts; inline rename and delete
-│   │   └── TaskConfig.tsx      # Per-task config: eligibility rules, schedule, enabled toggle
+│   │   ├── AllBookmarks.tsx ✓  # Stub — route "/" (full implementation: issue #5)
+│   │   ├── Favourites.tsx ✓    # Stub — route "/favourites" (issue #6)
+│   │   ├── Tags.tsx ✓          # Stub — route "/tags" (issue #7)
+│   │   ├── AddNew.tsx ✓        # Stub — route "/add" (issue #6)
+│   │   └── TaskConfig.tsx ✓    # Stub — route "/task-config" (issue #4+)
 │   ├── components/
-│   │   ├── SideNavigation.tsx  # Persistent left nav: All Bookmarks, Favourites, Tags, Add New, Task Config
-│   │   ├── BookmarkCard.tsx    # Card: thumbnail, name, URL, description, tags, favourite toggle
-│   │   ├── BookmarkForm.tsx    # Shared add/edit form fields
-│   │   ├── PaginationControls.tsx
-│   │   ├── SearchInput.tsx
-│   │   ├── TagFilter.tsx       # Multi-tag filter chips
-│   │   └── ThemeToggle.tsx     # Light/dark toggle
-│   ├── api/
-│   │   ├── bookmarks.ts     # Typed fetch wrappers for /api/bookmarks endpoints
-│   │   ├── tags.ts          # Typed fetch wrappers for /api/tags endpoints
-│   │   └── tasks.ts         # Typed fetch wrappers for /api/task-configs and /api/tasks endpoints
-│   └── types.ts             # Shared TypeScript types mirroring API schemas
-├── playwright/
-│   └── tests/               # e2e test specs
-├── index.html
-├── vite.config.ts
-├── tsconfig.json
-├── package.json
-└── pnpm-lock.yaml
+│   │   ├── SideNavigation.tsx ✓ # Persistent left nav: All Bookmarks, Favourites, Tags, Add New, Task Config; uses NavLink with active bold
+│   │   ├── ThemeToggle.tsx ✓    # Light/dark toggle; persists to localStorage; toggles body.dark class
+│   │   ├── BookmarkCard.tsx     # (planned — issue #5)
+│   │   ├── BookmarkForm.tsx     # (planned — issue #6)
+│   │   ├── PaginationControls.tsx # (planned — issue #5)
+│   │   ├── SearchInput.tsx      # (planned — issue #5)
+│   │   └── TagFilter.tsx        # (planned — issue #5)
+│   ├── api/                     # (planned — issue #5+)
+│   └── types.ts                 # (planned — issue #5+)
+├── playwright/                  # (planned — issue #5+)
+├── index.html ✓
+├── vite.config.ts ✓             # @vitejs/plugin-react; proxy /api → localhost:8000
+├── tsconfig.json ✓              # strict mode, noEmit, react-jsx
+├── package.json ✓               # 98.css 0.1.19, react 18.3.1, react-router-dom 6.28.0, vite 6.0.5
+└── pnpm-lock.yaml ✓
 ```
 
 ## Scripts (`scripts/`)
