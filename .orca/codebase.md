@@ -29,13 +29,26 @@ backend/
 │   ├── routes/              # (planned — issue #3, #4)
 │   ├── services/            # (planned — issue #3, #4)
 │   ├── repositories/        # (planned — issue #3, #4)
-│   ├── models/              # (planned — issue #2)
+│   ├── models/ ✓            # SQLAlchemy ORM models (issue #2)
+│   │   ├── bookmark.py ✓    # Bookmark model + bookmark_tags join table (many-to-many)
+│   │   ├── tag.py ✓         # Tag model; back-ref to Bookmark via bookmark_tags
+│   │   ├── task_config.py ✓ # TaskConfig model; url_patterns + tags as JSON columns
+│   │   └── __init__.py ✓    # Re-exports Bookmark, Tag, TaskConfig, bookmark_tags
 │   ├── schemas/             # (planned — issue #3, #4)
 │   ├── tasks/               # (planned — issue #3+)
 │   └── scheduler.py         # (planned — issue #3+)
-├── alembic/                 # (planned — issue #2)
-├── tests/                   # (planned — issue #2+)
-└── requirements.txt ✓       # fastapi, uvicorn, sqlalchemy, aiosqlite, alembic, apscheduler, httpx, pydantic — all pinned
+├── alembic/ ✓               # Alembic migrations (issue #2)
+│   ├── env.py ✓             # Async engine wired via run_sync; imports all models for autogenerate
+│   ├── script.py.mako ✓     # Default migration template
+│   └── versions/ ✓
+│       └── 47f1282d4645_initial_schema.py ✓  # Creates bookmarks, tags, task_configs, bookmark_tags
+├── alembic.ini ✓            # script_location=alembic; sqlalchemy.url overridden at runtime by DATABASE_URL
+├── pytest.ini ✓             # asyncio_mode=auto; loop_scope=function
+├── tests/ ✓                 # (issue #2+)
+│   ├── conftest.py ✓        # in-memory SQLite async session fixture (db_session)
+│   └── unit/
+│       └── test_models.py ✓ # 6 tests: import check + PRAGMA table_info per table
+└── requirements.txt ✓       # fastapi, uvicorn, sqlalchemy, aiosqlite, alembic, apscheduler, httpx, pydantic, pytest, pytest-asyncio — all pinned
 ```
 
 ## Frontend (`frontend/`)
