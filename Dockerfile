@@ -27,9 +27,6 @@ COPY backend/ ./backend/
 # Copy built SPA from stage 1
 COPY --from=frontend-build /build/frontend/dist ./frontend/dist
 
-# Static file server for the SPA
-RUN pip install --no-cache-dir waitress
-
 VOLUME ["/app/data"]
 
 ENV DATABASE_URL=sqlite+aiosqlite:////app/data/bookmarks.db
