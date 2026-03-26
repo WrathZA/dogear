@@ -1,0 +1,25 @@
+:root {
+  --nav-width: 180px;
+}
+
+body {
+  margin: 0;
+  background: #c0c0c0;
+}
+
+body.dark {
+  background: #1a1a1a;
+  color: #e0e0e0;
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+}
