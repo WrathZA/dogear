@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.next/
+.pnpm-store/
+
+# Data volume (never commit personal data)
+/data/
+
+# Orca runtime
+.orca/.lock
+.orca/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.local
