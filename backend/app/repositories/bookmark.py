@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.bookmark import Bookmark, bookmark_tags
@@ -156,20 +156,17 @@ class BookmarkRepository:
         return bookmarks, total
 
     async def _sync_tags(self, bookmark: Bookmark, tag_names: list[str]) -> None:
-        existing_tags = {t.name: t for t in bookmark.tags}
-        desired = set(tag_names)
-        current = set(existing_tags)
-
-        # Remove tags no longer needed
-        for name in current - desired:
-            bookmark.tags.remove(existing_tags[name])
-
-        # Add new tags
-        for name in desired - current:
+        # Delete all existing associations and rebuild — avoids async lazy-load on the relationship
+        await self._session.execute(
+            delete(bookmark_tags).where(bookmark_tags.c.bookmark_id == bookmark.id)
+        )
+        for name in tag_names:
             result = await self._session.execute(select(Tag).where(Tag.name == name))
             tag = result.scalar_one_or_none()
             if tag is None:
                 tag = Tag(id=str(uuid.uuid4()), name=name)
                 self._session.add(tag)
                 await self._session.flush()
-            bookmark.tags.append(tag)
+            await self._session.execute(
+                bookmark_tags.insert().values(bookmark_id=bookmark.id, tag_id=tag.id)
+            )

@@ -3,9 +3,9 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
+import app.models as _models  # noqa: F401 — registers models on Base.metadata
 from app.database import Base, get_session
 from app.main import app
-import app.models  # noqa: F401
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
